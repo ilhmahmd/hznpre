@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Details for {{ location['Tempat'] }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .main-img, .small-img {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .main-img {
+            height: 400px;
+        }
+
+        .small-img {
+            height: 180px;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #6c757d;
+        }
+
+        .i {
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .main-img {
+                height: 250px;
+            }
+
+            .small-img {
+                height: 100px;
+            }
+
+            #map {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-img, .small-img {
+                width: 100%;
+                height: auto;
+            }
+
+            #map {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fa fa-arrow-left"></i> <a href="/" class="back-link">Kembali</a>
+        <h1 class="my-4" style="font-size: 2.5em; font-weight: 700;">{{ location['Tempat'] }}</h1>
+        <div class="row">
+            <div class="col-md-7">
+                <img id="main-image" class="img-fluid main-img" src="{{ location['Gambar'] }}" alt="{{ location['Tempat'] }}">
+            </div>
+            <div class="col-md-5">
+                <h3 class="my-3" style="font-size: 1.75em; font-weight: 700;">Info Lokasi</h3>
+                <p>Alamat : {{ location['Alamat'] }}</p>
+                <p>Jarak : {{ location['Jarak (KM)'] }} KM (Dari Pusat Kota Batam)</p>
+                <p>Harga : Rp {{ location['Harga'] }}</p>
+                <div class="row mt-3">
+                    {% if location['Gambar'] %}
+                    <div class="col-4">
+                        <img class="img-fluid small-img" src="{{ location['Gambar'] }}" alt="Gambar" onclick="changeMainImage('{{ location['Gambar'] }}')">
+                    </div>
+                    {% endif %}
+                    {% if location['Gambar2'] %}
+                    <div class="col-4">
+                        <img class="img-fluid small-img" src="{{ location['Gambar2'] }}" alt="Gambar 2" onclick="changeMainImage('{{ location['Gambar2'] }}')">
+                    </div>
+                    {% endif %}
+                    {% if location['Gambar3'] %}
+                    <div class="col-4">
+                        <img class="img-fluid small-img" src="{{ location['Gambar3'] }}" alt="Gambar 3" onclick="changeMainImage('{{ location['Gambar3'] }}')">
+                    </div>
+                    {% endif %}
+                    <!-- {% if location['Gambar4'] %}
+                    <div class="col-6">
+                        <img class="img-fluid small-img" src="{{ location['Gambar4'] }}" alt="Gambar 4" onclick="changeMainImage('{{ location['Gambar4'] }}')">
+                    </div>
+                    {% endif %} -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="map"></div>
+            </div>
+        </div>
+        <h3 class="my-4" style="font-size: 1.75em; font-weight: 700;">Rekomendasi Lokasi Serupa</h3>
+        <div class="row">
+            {% for rec in recommendations %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <a href="/detail/{{ rec['Tempat'] }}" class="card-link">
+                    <div class="card">
+                        <img class="card-img-top" src="{{ rec['Gambar'] }}" alt="Gambar">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-size: 1.25em; font-weight: 700;">{{ rec['Tempat'] }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var location = [{{ location['Latitude'] }}, {{ location['Longitude'] }}];
+            var map = L.map('map').setView(location, 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker(location).addTo(map)
+                .bindPopup('<b>{{ location["Tempat"] }}</b><br>{{ location["Alamat"] }}')
+                .openPopup();
+        });
+
+        function changeMainImage(src) {
+            document.getElementById('main-image').src = src;
+        }
+    </script>
+</body>
+</html>

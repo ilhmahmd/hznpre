@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recommendations for {{ location_name }}</title>
+</head>
+<body>
+    <h1>Recommendations for {{ location_name }}</h1>
+    <h2>Details</h2>
+    <p>Address: {{ location['Alamat'] }}</p>
+    <p>Distance: {{ location['Jarak (KM)'] }} KM</p>
+    <p>Price: Rp {{ location['Harga'] }}</p>
+
+    <h2>Recommended Locations</h2>
+    <ul>
+        {% for rec in recommendations %}
+            <li>{{ rec['Tempat'] }} - {{ rec['Alamat'] }} - {{ rec['Jarak (KM)'] }} KM - Rp {{ rec['Harga'] }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Back</a>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# requirements.txt
+cython>=0.29.24
+setuptools>=49.6.0
